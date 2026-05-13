@@ -1,0 +1,293 @@
+  CL4-2MAP Reduce
+
+You’re basically doing a small Apache Hadoop MapReduce program step-by-step in the terminal.
+The confusing part is usually: Where do I type these commands? and What is happening in each step?
+
+Here’s the full flow from scratch in the simplest way.
+
+What You Need First
+
+You should already have:
+
+Java installed
+Hadoop installed
+Hadoop configured
+
+Usually done on:
+
+Ubuntu/Linux
+Virtual Machine
+Hadoop sandbox
+Big Picture
+
+You are doing 4 things:
+
+Write Java code
+Compile it
+Convert it into JAR file
+Run it on Hadoop
+STEP 0 — Open Terminal
+
+Everything is done in the Linux terminal.
+
+Open terminal and create a folder:
+
+mkdir hadoop_practical
+cd hadoop_practical
+
+Now all files will be inside this folder.
+
+STEP 1 — Create Java File
+
+Type:
+
+nano WordCount.java
+
+This opens a text editor called nano.
+
+Now paste your entire Java code inside it.
+
+After pasting:
+
+Save file in nano
+
+Press:
+
+CTRL + O
+
+Press ENTER
+
+Then exit:
+
+CTRL + X
+
+Now your Java file is saved.
+
+What This Code Does
+
+Your program:
+
+Reads text file
+Splits words using comma ,
+Converts words to uppercase
+Counts occurrences
+
+Example:
+
+Bus, Car, bus
+
+becomes:
+
+BUS → 2
+CAR → 1
+STEP 2 — Compile Java Code
+
+Now type:
+
+javac -source 1.8 -target 1.8 -classpath `hadoop classpath` -d . WordCount.java
+
+This converts:
+
+WordCount.java
+
+into:
+
+.class files
+
+These are Java bytecode files.
+
+After Compilation
+
+Check files:
+
+ls
+
+You should see:
+
+WordCount.java
+WordCount.class
+WordCount$MyMapper.class
+WordCount$MyReducer.class
+STEP 3 — Create JAR File
+
+Now package all .class files into one JAR.
+
+Type:
+
+jar -cvf wordcount.jar *.class
+
+Now check:
+
+ls
+
+You should see:
+
+wordcount.jar
+STEP 4 — Start Hadoop
+
+Now start Hadoop services.
+
+Start HDFS
+start-dfs.sh
+Start YARN
+start-yarn.sh
+Verify Hadoop Started
+
+Type:
+
+jps
+
+You should see processes like:
+
+NameNode
+DataNode
+ResourceManager
+NodeManager
+
+If yes → Hadoop running successfully.
+
+STEP 5 — Create Input File
+
+Create text file:
+
+nano wordcount.txt
+
+Write:
+
+Bus, Car, bus, car, train, car, bus, BUS
+
+Save:
+
+CTRL + O
+ENTER
+CTRL + X
+STEP 6 — Upload File to HDFS
+Create HDFS input folder
+hadoop fs -mkdir /input
+
+This creates folder in Hadoop storage.
+
+Upload file into HDFS
+hadoop fs -put wordcount.txt /input
+
+Now your file is inside Hadoop filesystem.
+
+Check File Uploaded
+
+Type:
+
+hadoop fs -ls /input
+
+You should see:
+
+wordcount.txt
+STEP 7 — Run MapReduce Job
+
+Now run your program:
+
+hadoop jar wordcount.jar WordCount /input /output
+
+Meaning:
+
+Part	Meaning
+hadoop jar	Run Hadoop program
+wordcount.jar	Your JAR file
+WordCount	Main class name
+/input	Input folder in HDFS
+/output	Output folder in HDFS
+IMPORTANT
+
+If /output already exists, Hadoop gives error.
+
+Delete old output first:
+
+hadoop fs -rm -r /output
+
+Then rerun job.
+
+STEP 8 — View Output
+
+Type:
+
+hadoop fs -cat /output/part-r-00000
+
+Expected output:
+
+BUS    4
+CAR    3
+TRAIN  1
+Complete Flow in One Sequence
+mkdir hadoop_practical
+cd hadoop_practical
+
+nano WordCount.java
+
+javac -source 1.8 -target 1.8 -classpath `hadoop classpath` -d . WordCount.java
+
+jar -cvf wordcount.jar *.class
+
+start-dfs.sh
+start-yarn.sh
+
+nano wordcount.txt
+
+hadoop fs -mkdir /input
+
+hadoop fs -put wordcount.txt /input
+
+hadoop jar wordcount.jar WordCount /input /output
+
+hadoop fs -cat /output/part-r-00000
+Simple Understanding of Hadoop Flow
+Mapper Phase
+
+Input:
+
+Bus, Car, bus
+
+Mapper outputs:
+
+BUS 1
+CAR 1
+BUS 1
+Reducer Phase
+
+Reducer combines counts:
+
+BUS 2
+CAR 1
+Common Errors
+1. Output folder exists
+
+Error:
+
+FileAlreadyExistsException
+
+Fix:
+
+hadoop fs -rm -r /output
+2. Hadoop not started
+
+Error like:
+
+Connection refused
+
+Fix:
+
+start-dfs.sh
+start-yarn.sh
+3. Java version issue
+
+Check Java:
+
+java -version
+javac -version
+Easy Analogy
+
+Think of Hadoop like:
+
+Thing	Real-life Meaning
+Mapper	Person counting words separately
+Reducer	Person combining all counts
+HDFS	Hadoop storage
+JAR	Packed Java project
