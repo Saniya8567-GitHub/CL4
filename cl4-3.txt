@@ -1,0 +1,181 @@
+STEP 1 — Download Project from GitHub
+
+Download ZIP file from GitHub.
+
+After downloading, it usually goes into:
+
+Downloads folder
+
+Example folder name:
+
+matrixmultiply-main
+STEP 2 — Open Terminal
+
+Open Ubuntu/Linux Terminal.
+
+STEP 3 — Go to Downloads Folder
+
+Type:
+
+cd ~/Downloads
+
+Press Enter.
+
+STEP 4 — Check Downloaded Folder
+
+Type:
+
+ls
+
+You will see something like:
+
+matrixmultiply-main
+STEP 5 — Open Project Folder
+
+Type:
+
+cd matrixmultiply-main
+
+Press Enter.
+
+STEP 6 — Check Files
+
+Type:
+
+ls
+
+You may see:
+
+Multiply.java
+input.txt
+
+OR maybe:
+
+Multiply.java
+Multiply.class
+Multiply$MatrixMapper.class
+Multiply$MatrixReducer.class
+input.txt
+CASE 1 — IF ONLY .java FILE EXISTS
+
+Compile program first.
+
+Run:
+
+javac -classpath $(hadoop classpath) Multiply.java
+
+Now check:
+
+ls
+
+You will get:
+
+Multiply.class
+Multiply$MatrixMapper.class
+Multiply$MatrixReducer.class
+STEP 7 — Create JAR File
+
+Run:
+
+jar cf multiply.jar *.class
+STEP 8 — Check JAR Created
+
+Run:
+
+ls
+
+You should now see:
+
+multiply.jar
+STEP 9 — Start Hadoop
+
+Run first command:
+
+start-dfs.sh
+
+Then run:
+
+start-yarn.sh
+STEP 10 — Verify Hadoop Running
+
+Run:
+
+jps
+
+You should see:
+
+NameNode
+DataNode
+ResourceManager
+NodeManager
+STEP 11 — Create Input Folder in Hadoop
+
+Run:
+
+hadoop fs -mkdir /input
+STEP 12 — Upload input.txt File
+
+Run:
+
+hadoop fs -put input.txt /input
+STEP 13 — Verify Upload
+
+Run:
+
+hadoop fs -ls /input
+
+You should see:
+
+input.txt
+STEP 14 — Delete Old Output Folder
+
+IMPORTANT before every run.
+
+Run:
+
+hadoop fs -rm -r /output
+
+If it says:
+
+No such file or directory
+
+that is okay.
+
+STEP 15 — RUN THE MAPREDUCE PROGRAM
+
+Run:
+
+hadoop jar multiply.jar Multiply /input /output
+
+Wait few seconds.
+
+If successful you will see:
+
+completed successfully
+STEP 16 — VIEW FINAL OUTPUT
+
+Run:
+
+hadoop fs -cat /output/part-r-00000
+
+Final answer:
+
+0,0    58.0
+0,1    64.0
+1,0    139.0
+1,1    154.0
+COMPLETE COMMANDS ONLY
+cd ~/Downloads
+ls
+cd matrixmultiply-main
+ls
+javac -classpath $(hadoop classpath) Multiply.java
+jar cf multiply.jar *.class
+start-dfs.sh
+start-yarn.sh
+jps
+hadoop fs -mkdir /input
+hadoop fs -put input.txt /input
+hadoop fs -rm -r /output
+hadoop jar multiply.jar Multiply /input /output
+hadoop fs -cat /output/part-r-00000
